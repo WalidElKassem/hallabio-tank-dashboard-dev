@@ -74,4 +74,11 @@
     statusEl.textContent = "Done.";
   }
 
-  document.getE
+  document.getElementById("btnLogin").addEventListener("click", setCredentials);
+  document.getElementById("btnRefresh").addEventListener("click", refresh);
+
+  // Optional: auto prompt on first load for convenience
+  // setCredentials();
+</script>
+</body>
+</html>
