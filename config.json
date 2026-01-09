@@ -1,0 +1,4 @@
+{
+  "apiBaseUrl": "https://hallabio-tank-api-dev.walidelkassems.workers.dev/api",
+  "devices": ["tankA", "tankB"]
+}
