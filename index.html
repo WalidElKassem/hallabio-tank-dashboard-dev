@@ -1,11 +1,77 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>HallabIO Tank Dashboard (DEV)</title>
-  </head>
-  <body>
-    <h1>HallabIO Tank Dashboard (DEV)</h1>
-    <p>DEV dashboard is live.</p>
-  </body>
-</html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HallabIO Tank Dashboard (DEV)</title>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin: 16px; }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 12px 0; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; }
+    button { padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; background: #f7f7f7; cursor: pointer; }
+    pre { background: #f6f8fa; padding: 10px; border-radius: 8px; overflow: auto; }
+    .muted { color: #666; font-size: 0.95em; }
+  </style>
+</head>
+<body>
+  <h1>HallabIO Tank Dashboard (DEV)</h1>
+  <p class="muted">Reads from your DEV Cloudflare Worker API.</p>
+
+  <div class="card">
+    <div class="row">
+      <button id="btnLogin">Set Credentials</button>
+      <button id="btnRefresh">Refresh</button>
+    </div>
+    <p class="muted" id="status">Not loaded yet.</p>
+  </div>
+
+  <div class="card">
+    <h2>tankA</h2>
+    <pre id="outA">(no data)</pre>
+  </div>
+
+  <div class="card">
+    <h2>tankB</h2>
+    <pre id="outB">(no data)</pre>
+  </div>
+
+<script>
+  const API_BASE = "https://hallabio-tank-api-dev.walidelkassems.workers.dev/api";
+  let authHeader = null;
+
+  function setCredentials() {
+    const user = prompt("DEV API username:");
+    if (user === null) return;
+    const pass = prompt("DEV API password:");
+    if (pass === null) return;
+    authHeader = "Basic " + btoa(user + ":" + pass);
+    document.getElementById("status").textContent = "Credentials set for this session.";
+  }
+
+  async function fetchLatest(deviceId) {
+    const res = await fetch(`${API_BASE}/latest?device_id=${encodeURIComponent(deviceId)}`, {
+      method: "GET",
+      headers: authHeader ? { "Authorization": authHeader } : {}
+    });
+    const text = await res.text();
+    return { status: res.status, body: text };
+  }
+
+  async function refresh() {
+    const statusEl = document.getElementById("status");
+
+    if (!authHeader) {
+      statusEl.textContent = "No credentials set. Click “Set Credentials” first.";
+      return;
+    }
+
+    statusEl.textContent = "Loading...";
+    const [a, b] = await Promise.all([fetchLatest("tankA"), fetchLatest("tankB")]);
+
+    document.getElementById("outA").textContent = `HTTP ${a.status}\n` + a.body;
+    document.getElementById("outB").textContent = `HTTP ${b.status}\n` + b.body;
+
+    statusEl.textContent = "Done.";
+  }
+
+  document.getE
