@@ -5,40 +5,113 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>HallabIO Tank Dashboard (DEV)</title>
   <style>
-    body { font-family: system-ui, Arial, sans-serif; margin: 16px; }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 12px; margin: 12px 0; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; }
-    button { padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; background: #f7f7f7; cursor: pointer; }
-    pre { background: #f6f8fa; padding: 10px; border-radius: 8px; overflow: auto; }
-    .muted { color: #666; font-size: 0.95em; }
+    :root { color-scheme: light; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 16px; }
+    h1 { font-size: 1.3rem; margin: 0 0 6px 0; }
+    .muted { color: #666; font-size: 0.95rem; }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 16px; }
+    button {
+      padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc;
+      background: #f7f7f7; cursor: pointer; font-weight: 600;
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+    .card { border: 1px solid #e2e2e2; border-radius: 14px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .card h2 { margin: 0 0 8px 0; font-size: 1.05rem; }
+    .big { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.02em; }
+    .badge { padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; border: 1px solid #ddd; }
+    .ok { background: #f2fff2; border-color: #bfe6bf; }
+    .low { background: #fff2f2; border-color: #f0baba; }
+    .unknown { background: #f6f6f6; }
+
+    .kv { display:grid; grid-template-columns: 140px 1fr; gap: 6px 10px; margin-top: 10px; }
+    .k { color:#666; }
+    .history { margin-top: 12px; }
+    .history ul { padding-left: 18px; margin: 8px 0 0; }
+    .history li { margin: 4px 0; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.9rem; }
+
+    .statusbar { margin: 10px 0; }
+    .statusline { padding: 10px 12px; border-radius: 12px; background:#f6f8fa; border:1px solid #e7e7e7; }
   </style>
 </head>
 <body>
   <h1>HallabIO Tank Dashboard (DEV)</h1>
-  <p class="muted">Reads from your DEV Cloudflare Worker API.</p>
+  <div class="muted">Mobile-friendly, read-only dashboard (Basic Auth). DEV Worker backend.</div>
 
-  <div class="card">
-    <div class="row">
-      <button id="btnLogin">Set Credentials</button>
-      <button id="btnRefresh">Refresh</button>
-      <button id="btnReadNowA">Read now (tankA)</button>
+  <div class="toolbar">
+    <button id="btnLogin">Set Credentials</button>
+    <button id="btnRefresh">Refresh All</button>
+  </div>
+
+  <div class="statusbar">
+    <div id="status" class="statusline muted">Not loaded yet.</div>
+  </div>
+
+  <div class="grid">
+    <div class="card" id="cardA">
+      <div class="row" style="justify-content: space-between;">
+        <h2>tankA</h2>
+        <span id="badgeA" class="badge unknown">UNKNOWN</span>
+      </div>
+
+      <div class="row" style="justify-content: space-between; align-items: baseline;">
+        <div>
+          <div id="levelA" class="big">--%</div>
+          <div id="updatedA" class="muted">Last updated: —</div>
+        </div>
+        <button id="btnReadNowA">Read now</button>
+      </div>
+
+      <div class="kv">
+        <div class="k">Source</div><div id="sourceA">—</div>
+        <div class="k">Raw timestamp</div><div id="tsA" class="mono">—</div>
+      </div>
+
+      <div class="history">
+        <div class="muted" style="font-weight:700;">History (last 5 days)</div>
+        <ul id="histA"><li class="muted">—</li></ul>
+      </div>
     </div>
-    <p class="muted" id="status">Not loaded yet.</p>
-  </div>
 
-  <div class="card">
-    <h2>tankA</h2>
-    <pre id="outA">(no data)</pre>
-  </div>
+    <div class="card" id="cardB">
+      <div class="row" style="justify-content: space-between;">
+        <h2>tankB</h2>
+        <span id="badgeB" class="badge unknown">UNKNOWN</span>
+      </div>
 
-  <div class="card">
-    <h2>tankB</h2>
-    <pre id="outB">(no data)</pre>
+      <div class="row" style="justify-content: space-between; align-items: baseline;">
+        <div>
+          <div id="levelB" class="big">--%</div>
+          <div id="updatedB" class="muted">Last updated: —</div>
+        </div>
+        <button id="btnReadNowB">Read now</button>
+      </div>
+
+      <div class="kv">
+        <div class="k">Source</div><div id="sourceB">—</div>
+        <div class="k">Raw timestamp</div><div id="tsB" class="mono">—</div>
+      </div>
+
+      <div class="history">
+        <div class="muted" style="font-weight:700;">History (last 5 days)</div>
+        <ul id="histB"><li class="muted">—</li></ul>
+      </div>
+    </div>
   </div>
 
 <script>
   const API_BASE = "https://hallabio-tank-api-dev.walidelkassems.workers.dev/api";
+  const LOW_THRESHOLD = 20;
+
   let authHeader = null;
+
+  function setStatus(msg) {
+    document.getElementById("status").textContent = msg;
+  }
 
   function setCredentials() {
     const user = prompt("DEV API username:");
@@ -46,93 +119,176 @@
     const pass = prompt("DEV API password:");
     if (pass === null) return;
     authHeader = "Basic " + btoa(user + ":" + pass);
-    document.getElementById("status").textContent = "Credentials set for this session.";
+    setStatus("Credentials set for this session.");
   }
 
-  async function fetchLatest(deviceId) {
-    const res = await fetch(`${API_BASE}/latest?device_id=${encodeURIComponent(deviceId)}`, {
-      method: "GET",
-      headers: authHeader ? { "Authorization": authHeader } : {}
-    });
-    const text = await res.text();
-    return { status: res.status, body: text };
+  function formatTs(ts) {
+    if (!ts) return "—";
+    try {
+      const d = new Date(ts);
+      return d.toLocaleString(undefined, { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+    } catch {
+      return ts;
+    }
   }
 
-  async function refresh() {
-    const statusEl = document.getElementById("status");
+  function setTankUI(deviceId, latestObj) {
+    const suf = deviceId === "tankA" ? "A" : "B";
+    const levelEl = document.getElementById("level" + suf);
+    const updatedEl = document.getElementById("updated" + suf);
+    const sourceEl = document.getElementById("source" + suf);
+    const tsEl = document.getElementById("ts" + suf);
+    const badgeEl = document.getElementById("badge" + suf);
 
-    if (!authHeader) {
-      statusEl.textContent = "No credentials set. Click “Set Credentials” first.";
+    if (!latestObj || !latestObj.data) {
+      levelEl.textContent = "--%";
+      updatedEl.textContent = "Last updated: —";
+      sourceEl.textContent = "—";
+      tsEl.textContent = "—";
+      badgeEl.className = "badge unknown";
+      badgeEl.textContent = "NO DATA";
       return;
     }
 
-    statusEl.textContent = "Loading...";
-    const [a, b] = await Promise.all([fetchLatest("tankA"), fetchLatest("tankB")]);
+    const d = latestObj.data;
+    const lvl = Number(d.level_pct);
 
-    document.getElementById("outA").textContent = `HTTP ${a.status}\n` + a.body;
-    document.getElementById("outB").textContent = `HTTP ${b.status}\n` + b.body;
+    levelEl.textContent = (Number.isFinite(lvl) ? lvl.toFixed(1) : "--") + "%";
+    updatedEl.textContent = "Last updated: " + formatTs(d.ts);
+    sourceEl.textContent = d.source || "—";
+    tsEl.textContent = d.ts || "—";
 
-    statusEl.textContent = "Done.";
+    if (Number.isFinite(lvl) && lvl < LOW_THRESHOLD) {
+      badgeEl.className = "badge low";
+      badgeEl.textContent = "LOW";
+    } else {
+      badgeEl.className = "badge ok";
+      badgeEl.textContent = "OK";
+    }
+  }
+
+  function setHistoryUI(deviceId, readings) {
+    const ul = document.getElementById(deviceId === "tankA" ? "histA" : "histB");
+    ul.innerHTML = "";
+
+    if (!readings || readings.length === 0) {
+      const li = document.createElement("li");
+      li.className = "muted";
+      li.textContent = "No history yet.";
+      ul.appendChild(li);
+      return;
+    }
+
+    // Show up to last 12 items
+    readings.slice(0, 12).forEach(r => {
+      const li = document.createElement("li");
+      const lvl = Number(r.level_pct);
+      const lvlTxt = Number.isFinite(lvl) ? lvl.toFixed(1) + "%" : "?%";
+      li.innerHTML = `<span class="mono">${formatTs(r.ts)}</span> — <b>${lvlTxt}</b> <span class="muted">(${r.source || "?"})</span>`;
+      ul.appendChild(li);
+    });
+  }
+
+  async function apiGet(path) {
+    if (!authHeader) throw new Error("No credentials set");
+    const res = await fetch(API_BASE + path, {
+      method: "GET",
+      headers: { "Authorization": authHeader }
+    });
+    const text = await res.text();
+    return { status: res.status, text };
+  }
+
+  async function apiPost(path) {
+    if (!authHeader) throw new Error("No credentials set");
+    const res = await fetch(API_BASE + path, {
+      method: "POST",
+      headers: { "Authorization": authHeader }
+    });
+    const text = await res.text();
+    return { status: res.status, text };
+  }
+
+  async function refreshOne(deviceId) {
+    // latest
+    const latestResp = await apiGet(`/latest?device_id=${encodeURIComponent(deviceId)}`);
+    let latestObj = null;
+    try { latestObj = JSON.parse(latestResp.text); } catch {}
+    setTankUI(deviceId, latestObj);
+
+    // history
+    const histResp = await apiGet(`/history?device_id=${encodeURIComponent(deviceId)}&days=5`);
+    let histObj = null;
+    try { histObj = JSON.parse(histResp.text); } catch {}
+    setHistoryUI(deviceId, histObj?.readings || []);
+  }
+
+  async function refreshAll() {
+    if (!authHeader) {
+      setStatus("No credentials set. Click “Set Credentials” first.");
+      return;
+    }
+
+    setStatus("Loading...");
+    try {
+      await Promise.all([refreshOne("tankA"), refreshOne("tankB")]);
+      setStatus("Updated.");
+    } catch (e) {
+      setStatus("Error: " + (e?.message || e));
+    }
+  }
+
+  async function readNow(deviceId) {
+    if (!authHeader) {
+      setStatus("No credentials set. Click “Set Credentials” first.");
+      return;
+    }
+
+    const btn = document.getElementById(deviceId === "tankA" ? "btnReadNowA" : "btnReadNowB");
+    btn.disabled = true;
+    const oldTxt = btn.textContent;
+    btn.textContent = "Working...";
+
+    try {
+      // capture old ts
+      let oldTs = null;
+      try {
+        const latest = await apiGet(`/latest?device_id=${encodeURIComponent(deviceId)}`);
+        const obj = JSON.parse(latest.text);
+        oldTs = obj?.data?.ts || null;
+      } catch {}
+
+      setStatus(`Sending Read Now for ${deviceId}...`);
+      const r = await apiPost(`/command/read_now?device_id=${encodeURIComponent(deviceId)}`);
+      setStatus(`Read Now sent (HTTP ${r.status}). Waiting for device update...`);
+
+      const start = Date.now();
+      while (Date.now() - start < 70000) {
+        await new Promise(res => setTimeout(res, 4000));
+        const latest = await apiGet(`/latest?device_id=${encodeURIComponent(deviceId)}`);
+        const obj = JSON.parse(latest.text);
+        const newTs = obj?.data?.ts || null;
+
+        if (newTs && newTs !== oldTs) {
+          setStatus(`${deviceId} updated successfully.`);
+          await refreshAll();
+          return;
+        }
+      }
+
+      setStatus(`Timeout waiting for ${deviceId}. Check ESP32 is online.`);
+    } catch (e) {
+      setStatus("Error: " + (e?.message || e));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldTxt;
+    }
   }
 
   document.getElementById("btnLogin").addEventListener("click", setCredentials);
-  document.getElementById("btnRefresh").addEventListener("click", refresh);
-
-  // Optional: auto prompt on first load for convenience
-  // setCredentials();
-
-  async function readNow(deviceId) {
-  const statusEl = document.getElementById("status");
-
-  if (!authHeader) {
-    statusEl.textContent = "No credentials set. Click “Set Credentials” first.";
-    return;
-  }
-
-  statusEl.textContent = `Sending Read Now for ${deviceId}...`;
-
-  const res = await fetch(`${API_BASE}/command/read_now?device_id=${encodeURIComponent(deviceId)}`, {
-    method: "POST",
-    headers: { "Authorization": authHeader }
-  });
-
-  const text = await res.text();
-  statusEl.textContent = `Read Now sent (HTTP ${res.status}). Waiting for device...`;
-
-  // Now poll latest for up to 60 seconds until ts changes
-  const start = Date.now();
-  let lastTs = null;
-
-  // First capture current ts
-  try {
-    const current = await fetch(`${API_BASE}/latest?device_id=${encodeURIComponent(deviceId)}`, {
-      headers: { "Authorization": authHeader }
-    });
-    const obj = await current.json();
-    lastTs = obj?.data?.ts || null;
-  } catch {}
-
-  while (Date.now() - start < 60000) {
-    await new Promise(r => setTimeout(r, 4000));
-
-    const latest = await fetch(`${API_BASE}/latest?device_id=${encodeURIComponent(deviceId)}`, {
-      headers: { "Authorization": authHeader }
-    });
-    const obj = await latest.json();
-    const newTs = obj?.data?.ts || null;
-
-    if (newTs && newTs !== lastTs) {
-      statusEl.textContent = `Device updated ${deviceId} successfully.`;
-      await refresh(); // update both tank panels
-      return;
-    }
-  }
-
-  statusEl.textContent = `Timeout waiting for ${deviceId}. Check ESP32 is online.`;
-}
-
-document.getElementById("btnReadNowA").addEventListener("click", () => readNow("tankA"));
-
+  document.getElementById("btnRefresh").addEventListener("click", refreshAll);
+  document.getElementById("btnReadNowA").addEventListener("click", () => readNow("tankA"));
+  document.getElementById("btnReadNowB").addEventListener("click", () => readNow("tankB"));
 </script>
 </body>
 </html>
