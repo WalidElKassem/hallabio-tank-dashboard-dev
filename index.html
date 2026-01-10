@@ -21,6 +21,7 @@
     <div class="row">
       <button id="btnLogin">Set Credentials</button>
       <button id="btnRefresh">Refresh</button>
+      <button id="btnReadNowA">Read now (tankA)</button>
     </div>
     <p class="muted" id="status">Not loaded yet.</p>
   </div>
@@ -79,6 +80,59 @@
 
   // Optional: auto prompt on first load for convenience
   // setCredentials();
+
+  async function readNow(deviceId) {
+  const statusEl = document.getElementById("status");
+
+  if (!authHeader) {
+    statusEl.textContent = "No credentials set. Click “Set Credentials” first.";
+    return;
+  }
+
+  statusEl.textContent = `Sending Read Now for ${deviceId}...`;
+
+  const res = await fetch(`${API_BASE}/command/read_now?device_id=${encodeURIComponent(deviceId)}`, {
+    method: "POST",
+    headers: { "Authorization": authHeader }
+  });
+
+  const text = await res.text();
+  statusEl.textContent = `Read Now sent (HTTP ${res.status}). Waiting for device...`;
+
+  // Now poll latest for up to 60 seconds until ts changes
+  const start = Date.now();
+  let lastTs = null;
+
+  // First capture current ts
+  try {
+    const current = await fetch(`${API_BASE}/latest?device_id=${encodeURIComponent(deviceId)}`, {
+      headers: { "Authorization": authHeader }
+    });
+    const obj = await current.json();
+    lastTs = obj?.data?.ts || null;
+  } catch {}
+
+  while (Date.now() - start < 60000) {
+    await new Promise(r => setTimeout(r, 4000));
+
+    const latest = await fetch(`${API_BASE}/latest?device_id=${encodeURIComponent(deviceId)}`, {
+      headers: { "Authorization": authHeader }
+    });
+    const obj = await latest.json();
+    const newTs = obj?.data?.ts || null;
+
+    if (newTs && newTs !== lastTs) {
+      statusEl.textContent = `Device updated ${deviceId} successfully.`;
+      await refresh(); // update both tank panels
+      return;
+    }
+  }
+
+  statusEl.textContent = `Timeout waiting for ${deviceId}. Check ESP32 is online.`;
+}
+
+document.getElementById("btnReadNowA").addEventListener("click", () => readNow("tankA"));
+
 </script>
 </body>
 </html>
