@@ -14,8 +14,9 @@
       <div class="muted">Private DEV dashboard — Basic Auth • DEV Worker backend</div>
     </div>
     <div class="header-actions">
-      <button id="btnChangeLogin" class="ghost" style="display:none;">Change login</button>
-      <button id="btnRefresh" disabled>Refresh All</button>
+      <button id="btnLoginTop" class="primary">Login</button>
+      <button id="btnChangeLogin" class="ghost" style="display:none;">Change</button>
+      <button id="btnRefresh" disabled title="Refresh all tanks">Refresh</button>
     </div>
   </header>
 
@@ -23,9 +24,8 @@
   <div id="loginGate" class="gate" style="display:none;">
     <div>
       <h3>Login required</h3>
-      <div class="muted">To view tank values, tap <b>Login</b> and enter your DEV credentials.</div>
+      <div class="muted">Sign in using the top-right Login button to view your tanks.</div>
     </div>
-    <button id="btnLoginBig" class="primary">Login</button>
   </div>
 
   <div class="statusbar">
@@ -40,11 +40,17 @@
       </div>
 
       <div class="row" style="align-items: baseline;">
-        <div>
-          <div id="levelA" class="big">--%</div>
+        <div class="gauge-wrap">
+          <div class="gauge" id="gaugeA" role="img" aria-label="Tank A level">
+            <svg viewBox="0 0 36 36" class="circular">
+              <path class="bg" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831"/>
+              <path id="meterA" class="meter" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831" stroke-dasharray="0 100" />
+              <text x="18" y="20.35" transform="rotate(90 18 20.35)" class="gauge-value" id="levelA">--%</text>
+            </svg>
+          </div>
           <div id="updatedA" class="muted">Last updated: —</div>
         </div>
-        <button id="btnReadNowA" disabled>Read now</button>
+        <div class="card-actions"><button id="btnReadNowA" disabled>Read now</button></div>
       </div>
 
       <div class="kv">
@@ -65,11 +71,17 @@
       </div>
 
       <div class="row" style="align-items: baseline;">
-        <div>
-          <div id="levelB" class="big">--%</div>
+        <div class="gauge-wrap">
+          <div class="gauge" id="gaugeB" role="img" aria-label="Tank B level">
+            <svg viewBox="0 0 36 36" class="circular">
+              <path class="bg" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831"/>
+              <path id="meterB" class="meter" d="M18 2.0845a15.9155 15.9155 0 0 1 0 31.831" stroke-dasharray="0 100" />
+              <text x="18" y="20.35" transform="rotate(90 18 20.35)" class="gauge-value" id="levelB">--%</text>
+            </svg>
+          </div>
           <div id="updatedB" class="muted">Last updated: —</div>
         </div>
-        <button id="btnReadNowB" disabled>Read now</button>
+        <div class="card-actions"><button id="btnReadNowB" disabled>Read now</button></div>
       </div>
 
       <div class="kv">

@@ -29,12 +29,29 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 .low { background: #fff1f2; border-color: #ffd6d9; color:#981b1b }
 .unknown { background: #f3f4f6; border-color:#e5e7eb; color:#374151 }
 
-.kv { display:grid; grid-template-columns: 120px 1fr; gap: 6px 10px; margin-top: 10px; }
+.kv { display:grid; grid-template-columns: 120px 1fr; gap: 6px 10px; margin-top: 18px; }
 .k { color:#6b7280; }
 .history { margin-top: 12px; }
 .history ul { padding-left: 18px; margin: 8px 0 0; }
 .history li { margin: 6px 0; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.9rem; }
+
+/* Gauge styles */
+.gauge-wrap { display:flex; gap:12px; align-items:center }
+.gauge { width:88px; height:88px; display:flex; align-items:center; justify-content:center }
+.circular { width:88px; height:88px; transform: rotate(-90deg); overflow:visible }
+.circular .bg { fill: none; stroke: #eef2f7; stroke-width: 3.6; }
+.circular .meter { fill:none; stroke:#0f4fd8; stroke-width:3.6; stroke-linecap:round; transition: stroke-dasharray 600ms ease, stroke 300ms ease; }
+.circular .meter.low { stroke: #dc2626; }
+.gauge-value { font-size: 0.82rem; font-weight:800; text-anchor:middle; fill:#0b1220 }
+
+/* header actions */
+.header-actions button { padding: 8px 10px; border-radius: 10px; font-size:0.9rem }
+.header-actions .primary { padding: 8px 12px; }
+.header-actions .ghost { padding: 6px 8px }
+
+.card-actions { display:flex; align-items:center }
+
 
 .statusbar { margin: 12px 0 18px; }
 .statusline { padding: 10px 12px; border-radius: 12px; background:#ffffff; border:1px solid rgba(12,18,32,0.04); color:#374151 }

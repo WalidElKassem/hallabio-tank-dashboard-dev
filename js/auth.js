@@ -6,6 +6,7 @@ window.updateLoginUI = function(){
   const grid = document.querySelector(".grid");
   const btnRefresh = document.getElementById("btnRefresh");
   const btnChangeLogin = document.getElementById("btnChangeLogin");
+  const btnLoginTop = document.getElementById("btnLoginTop");
   const btnReadNowA = document.getElementById("btnReadNowA");
   const btnReadNowB = document.getElementById("btnReadNowB");
 
@@ -18,7 +19,8 @@ window.updateLoginUI = function(){
     if(btnReadNowB) btnReadNowB.disabled = true;
 
     if(btnChangeLogin) btnChangeLogin.style.display = "none";
-    if(window.setStatus) window.setStatus("Login required: tap “Login” above to load your tanks.");
+    if(btnLoginTop) btnLoginTop.style.display = "inline-block";
+    if(window.setStatus) window.setStatus("Login required: tap Login to load your tanks.");
   } else {
     gate.style.display = "none";
     grid.classList.remove("dimmed");
@@ -28,7 +30,8 @@ window.updateLoginUI = function(){
     if(btnReadNowB) btnReadNowB.disabled = false;
 
     if(btnChangeLogin) btnChangeLogin.style.display = "inline-block";
-    if(window.setStatus) window.setStatus("Logged in. Tap “Refresh All” to update.");
+    if(btnLoginTop) btnLoginTop.style.display = "none";
+    if(window.setStatus) window.setStatus("Logged in. Tap Refresh to update.");
   }
 }
 

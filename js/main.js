@@ -51,7 +51,7 @@ window.readNow = async function(deviceId){
 
 // Wiring event handlers
 document.addEventListener('DOMContentLoaded', function(){
-  const btnLogin = document.getElementById("btnLoginBig");
+  const btnLogin = document.getElementById("btnLoginTop");
   const btnChange = document.getElementById("btnChangeLogin");
   const btnRefresh = document.getElementById("btnRefresh");
   const btnReadNowA = document.getElementById("btnReadNowA");

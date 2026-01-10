@@ -59,11 +59,22 @@ window.setTankUI = function(deviceId, latestObj){
   if(sourceEl) sourceEl.textContent = d.source || "—";
   if(tsEl) tsEl.textContent = d.ts || "—";
 
+  // update badge
   if (Number.isFinite(lvl) && lvl < window.LOW_THRESHOLD) {
     if(badgeEl){ badgeEl.className = "badge low"; badgeEl.textContent = "LOW"; }
   } else {
     if(badgeEl){ badgeEl.className = "badge ok"; badgeEl.textContent = "OK"; }
   }
+
+  // update circular gauge (SVG path meter)
+  try {
+    const meter = document.getElementById('meter' + suf);
+    const pct = Number.isFinite(lvl) ? Math.max(0, Math.min(100, lvl)) : 0;
+    if (meter) {
+      meter.setAttribute('stroke-dasharray', `${pct} 100`);
+      if (pct < window.LOW_THRESHOLD) meter.classList.add('low'); else meter.classList.remove('low');
+    }
+  } catch (e) {}
 }
 
 window.setHistoryUI = function(deviceId, readings){
