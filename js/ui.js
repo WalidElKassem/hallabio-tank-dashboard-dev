@@ -1,0 +1,111 @@
+// UI helpers: status, formatting, rendering
+window.setStatus = function(msg){
+  const el = document.getElementById("status");
+  if(el) el.textContent = msg;
+}
+
+window.formatTs = function(ts){
+  if (!ts) return "—";
+  try {
+    const d = new Date(ts);
+    return d.toLocaleString(undefined, {
+      year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", second:"2-digit"
+    });
+  } catch {
+    return ts;
+  }
+}
+
+window.localDateKey = function(ts){
+  const d = new Date(ts);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+window.labelForDateKey = function(key){
+  const today = window.localDateKey(new Date().toISOString());
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const yesterday = window.localDateKey(y.toISOString());
+  if (key === today) return "Today";
+  if (key === yesterday) return "Yesterday";
+  return key;
+}
+
+window.setTankUI = function(deviceId, latestObj){
+  const suf = deviceId === "tankA" ? "A" : "B";
+  const levelEl = document.getElementById("level" + suf);
+  const updatedEl = document.getElementById("updated" + suf);
+  const sourceEl = document.getElementById("source" + suf);
+  const tsEl = document.getElementById("ts" + suf);
+  const badgeEl = document.getElementById("badge" + suf);
+
+  if (!latestObj || !latestObj.data) {
+    if(levelEl) levelEl.textContent = "--%";
+    if(updatedEl) updatedEl.textContent = "Last updated: —";
+    if(sourceEl) sourceEl.textContent = "—";
+    if(tsEl) tsEl.textContent = "—";
+    if(badgeEl) { badgeEl.className = "badge unknown"; badgeEl.textContent = "NO DATA"; }
+    return;
+  }
+
+  const d = latestObj.data;
+  const lvl = Number(d.level_pct);
+
+  if(levelEl) levelEl.textContent = (Number.isFinite(lvl) ? lvl.toFixed(1) : "--") + "%";
+  if(updatedEl) updatedEl.textContent = "Last updated: " + window.formatTs(d.ts);
+  if(sourceEl) sourceEl.textContent = d.source || "—";
+  if(tsEl) tsEl.textContent = d.ts || "—";
+
+  if (Number.isFinite(lvl) && lvl < window.LOW_THRESHOLD) {
+    if(badgeEl){ badgeEl.className = "badge low"; badgeEl.textContent = "LOW"; }
+  } else {
+    if(badgeEl){ badgeEl.className = "badge ok"; badgeEl.textContent = "OK"; }
+  }
+}
+
+window.setHistoryUI = function(deviceId, readings){
+  const ul = document.getElementById(deviceId === "tankA" ? "histA" : "histB");
+  if(!ul) return;
+  ul.innerHTML = "";
+
+  if (!readings || readings.length === 0) {
+    const li = document.createElement("li");
+    li.className = "muted";
+    li.textContent = "No history yet.";
+    ul.appendChild(li);
+    return;
+  }
+
+  const sorted = readings.slice().sort((a, b) => new Date(b.ts) - new Date(a.ts));
+  const groups = new Map();
+  for (const r of sorted) {
+    const key = window.localDateKey(r.ts);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(r);
+  }
+
+  const keys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
+  const MAX_ITEMS = 30; let rendered = 0;
+
+  for (const key of keys) {
+    if (rendered >= MAX_ITEMS) break;
+    const headerLi = document.createElement("li");
+    headerLi.style.marginTop = "10px";
+    headerLi.style.listStyle = "none";
+    headerLi.innerHTML = `<span class="muted" style="font-weight:800;">${window.labelForDateKey(key)}</span>`;
+    ul.appendChild(headerLi);
+
+    for (const r of groups.get(key)) {
+      if (rendered >= MAX_ITEMS) break;
+      const li = document.createElement("li");
+      const lvl = Number(r.level_pct);
+      const lvlTxt = Number.isFinite(lvl) ? lvl.toFixed(1) + "%" : "?%";
+      li.innerHTML = `<span class="mono">${window.formatTs(r.ts)}</span> — <b>${lvlTxt}</b> <span class="muted">(${r.source || "?"})</span>`;
+      ul.appendChild(li);
+      rendered++;
+    }
+  }
+}
