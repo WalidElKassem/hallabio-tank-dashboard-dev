@@ -167,27 +167,86 @@
     }
   }
 
-  function setHistoryUI(deviceId, readings) {
-    const ul = document.getElementById(deviceId === "tankA" ? "histA" : "histB");
-    ul.innerHTML = "";
+  function localDateKey(ts) {
+  const d = new Date(ts);
+  // YYYY-MM-DD in local time
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
-    if (!readings || readings.length === 0) {
-      const li = document.createElement("li");
-      li.className = "muted";
-      li.textContent = "No history yet.";
-      ul.appendChild(li);
-      return;
-    }
+function labelForDateKey(key) {
+  const today = localDateKey(new Date().toISOString());
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = localDateKey(yesterdayDate.toISOString());
 
-    // Show up to last 12 items
-    readings.slice(0, 12).forEach(r => {
+  if (key === today) return "Today";
+  if (key === yesterday) return "Yesterday";
+  return key; // fallback: YYYY-MM-DD
+}
+
+
+function setHistoryUI(deviceId, readings) {
+  const ul = document.getElementById(deviceId === "tankA" ? "histA" : "histB");
+  ul.innerHTML = "";
+
+  if (!readings || readings.length === 0) {
+    const li = document.createElement("li");
+    li.className = "muted";
+    li.textContent = "No history yet.";
+    ul.appendChild(li);
+    return;
+  }
+
+  // Sort newest first (by timestamp)
+  const sorted = readings.slice().sort((a, b) => {
+    const ta = new Date(a.ts).getTime();
+    const tb = new Date(b.ts).getTime();
+    return tb - ta;
+  });
+
+  // Group by LOCAL day
+  const groups = new Map(); // dateKey -> array
+  for (const r of sorted) {
+    const key = localDateKey(r.ts);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(r);
+  }
+
+  // Render groups in newest day first
+  const keys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
+
+  // Limit total rendered items for mobile (adjust if you want)
+  const MAX_ITEMS = 30;
+  let rendered = 0;
+
+  for (const key of keys) {
+    if (rendered >= MAX_ITEMS) break;
+
+    // Day header
+    const headerLi = document.createElement("li");
+    headerLi.style.marginTop = "10px";
+    headerLi.style.listStyle = "none";
+    headerLi.innerHTML = `<span class="muted" style="font-weight:800;">${labelForDateKey(key)}</span>`;
+    ul.appendChild(headerLi);
+
+    for (const r of groups.get(key)) {
+      if (rendered >= MAX_ITEMS) break;
+
       const li = document.createElement("li");
       const lvl = Number(r.level_pct);
       const lvlTxt = Number.isFinite(lvl) ? lvl.toFixed(1) + "%" : "?%";
-      li.innerHTML = `<span class="mono">${formatTs(r.ts)}</span> — <b>${lvlTxt}</b> <span class="muted">(${r.source || "?"})</span>`;
+      li.innerHTML =
+        `<span class="mono">${formatTs(r.ts)}</span> — <b>${lvlTxt}</b> ` +
+        `<span class="muted">(${r.source || "?"})</span>`;
       ul.appendChild(li);
-    });
+      rendered++;
+    }
   }
+}
+
 
   async function apiGet(path) {
     if (!authHeader) throw new Error("No credentials set");
