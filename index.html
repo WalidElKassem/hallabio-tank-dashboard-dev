@@ -9,19 +9,23 @@
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 16px; }
     h1 { font-size: 1.3rem; margin: 0 0 6px 0; }
     .muted { color: #666; font-size: 0.95rem; }
-    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 16px; }
+
+    .toolbar { display:flex; gap:10px; flex-wrap:wrap; margin: 12px 0 12px; align-items:center; }
     button {
       padding: 10px 12px; border-radius: 10px; border: 1px solid #ccc;
       background: #f7f7f7; cursor: pointer; font-weight: 600;
     }
     button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .ghost { background: transparent; border-color: #ddd; }
+
     .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     @media (min-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
 
     .card { border: 1px solid #e2e2e2; border-radius: 14px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
     .card h2 { margin: 0 0 8px 0; font-size: 1.05rem; }
     .big { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.02em; }
+
     .badge { padding: 4px 10px; border-radius: 999px; font-size: 0.85rem; font-weight: 700; border: 1px solid #ddd; }
     .ok { background: #f2fff2; border-color: #bfe6bf; }
     .low { background: #fff2f2; border-color: #f0baba; }
@@ -34,70 +38,98 @@
     .history li { margin: 4px 0; }
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.9rem; }
 
-    .statusbar { margin: 10px 0; }
+    .statusbar { margin: 10px 0 14px; }
     .statusline { padding: 10px 12px; border-radius: 12px; background:#f6f8fa; border:1px solid #e7e7e7; }
+
+    /* Login gate */
+    .gate {
+      border: 1px solid #f0c36d;
+      background: #fff8e6;
+      border-radius: 14px;
+      padding: 14px;
+      margin: 10px 0 14px;
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .gate h3 { margin: 0; }
+    .primary { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+    .dimmed { opacity: 0.45; filter: blur(0.8px); pointer-events: none; }
   </style>
 </head>
+
 <body>
   <h1>HallabIO Tank Dashboard (DEV)</h1>
-  <div class="muted">Mobile-friendly, read-only dashboard (Basic Auth). DEV Worker backend.</div>
+  <div class="muted">Private dashboard (Basic Auth). DEV Worker backend.</div>
 
+  <!-- Toolbar: only actions that make sense after login -->
   <div class="toolbar">
-    <button id="btnLogin">Set Credentials</button>
-    <button id="btnRefresh">Refresh All</button>
+    <button id="btnChangeLogin" class="ghost" style="display:none;">Change login</button>
+    <button id="btnRefresh" disabled>Refresh All</button>
+  </div>
+
+  <!-- Login Gate: the single obvious entry point -->
+  <div id="loginGate" class="gate" style="display:none;">
+    <div>
+      <h3>Login required</h3>
+      <div class="muted">To view tank values, tap <b>Login</b> and enter your DEV credentials.</div>
+    </div>
+    <button id="btnLoginBig" class="primary">Login</button>
   </div>
 
   <div class="statusbar">
-    <div id="status" class="statusline muted">Not loaded yet.</div>
+    <div id="status" class="statusline muted">Loading…</div>
   </div>
 
   <div class="grid">
     <div class="card" id="cardA">
-      <div class="row" style="justify-content: space-between;">
+      <div class="row">
         <h2>tankA</h2>
         <span id="badgeA" class="badge unknown">UNKNOWN</span>
       </div>
 
-      <div class="row" style="justify-content: space-between; align-items: baseline;">
+      <div class="row" style="align-items: baseline;">
         <div>
           <div id="levelA" class="big">--%</div>
           <div id="updatedA" class="muted">Last updated: —</div>
         </div>
-        <button id="btnReadNowA">Read now</button>
+        <button id="btnReadNowA" disabled>Read now</button>
       </div>
 
       <div class="kv">
         <div class="k">Source</div><div id="sourceA">—</div>
-        <div class="k">Raw timestamp</div><div id="tsA" class="mono">—</div>
+        <div class="k">UTC timestamp</div><div id="tsA" class="mono">—</div>
       </div>
 
       <div class="history">
-        <div class="muted" style="font-weight:700;">History (last 5 days)</div>
+        <div class="muted" style="font-weight:700;">History (local time, last 5 days)</div>
         <ul id="histA"><li class="muted">—</li></ul>
       </div>
     </div>
 
     <div class="card" id="cardB">
-      <div class="row" style="justify-content: space-between;">
+      <div class="row">
         <h2>tankB</h2>
         <span id="badgeB" class="badge unknown">UNKNOWN</span>
       </div>
 
-      <div class="row" style="justify-content: space-between; align-items: baseline;">
+      <div class="row" style="align-items: baseline;">
         <div>
           <div id="levelB" class="big">--%</div>
           <div id="updatedB" class="muted">Last updated: —</div>
         </div>
-        <button id="btnReadNowB">Read now</button>
+        <button id="btnReadNowB" disabled>Read now</button>
       </div>
 
       <div class="kv">
         <div class="k">Source</div><div id="sourceB">—</div>
-        <div class="k">Raw timestamp</div><div id="tsB" class="mono">—</div>
+        <div class="k">UTC timestamp</div><div id="tsB" class="mono">—</div>
       </div>
 
       <div class="history">
-        <div class="muted" style="font-weight:700;">History (last 5 days)</div>
+        <div class="muted" style="font-weight:700;">History (local time, last 5 days)</div>
         <ul id="histB"><li class="muted">—</li></ul>
       </div>
     </div>
@@ -113,23 +145,76 @@
     document.getElementById("status").textContent = msg;
   }
 
-  function setCredentials() {
-    const user = prompt("DEV API username:");
-    if (user === null) return;
-    const pass = prompt("DEV API password:");
-    if (pass === null) return;
-    authHeader = "Basic " + btoa(user + ":" + pass);
-    setStatus("Credentials set for this session.");
-  }
-
   function formatTs(ts) {
     if (!ts) return "—";
     try {
       const d = new Date(ts);
-      return d.toLocaleString(undefined, { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit", second:"2-digit" });
+      return d.toLocaleString(undefined, {
+        year:"numeric", month:"2-digit", day:"2-digit",
+        hour:"2-digit", minute:"2-digit", second:"2-digit"
+      });
     } catch {
       return ts;
     }
+  }
+
+  function localDateKey(ts) {
+    const d = new Date(ts);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  }
+
+  function labelForDateKey(key) {
+    const today = localDateKey(new Date().toISOString());
+    const y = new Date(); y.setDate(y.getDate() - 1);
+    const yesterday = localDateKey(y.toISOString());
+    if (key === today) return "Today";
+    if (key === yesterday) return "Yesterday";
+    return key;
+  }
+
+  function updateLoginUI() {
+    const gate = document.getElementById("loginGate");
+    const grid = document.querySelector(".grid");
+    const btnRefresh = document.getElementById("btnRefresh");
+    const btnChangeLogin = document.getElementById("btnChangeLogin");
+    const btnReadNowA = document.getElementById("btnReadNowA");
+    const btnReadNowB = document.getElementById("btnReadNowB");
+
+    if (!authHeader) {
+      gate.style.display = "flex";
+      grid.classList.add("dimmed");
+
+      btnRefresh.disabled = true;
+      btnReadNowA.disabled = true;
+      btnReadNowB.disabled = true;
+
+      btnChangeLogin.style.display = "none";
+      setStatus("Login required: tap “Login” above to load your tanks.");
+    } else {
+      gate.style.display = "none";
+      grid.classList.remove("dimmed");
+
+      btnRefresh.disabled = false;
+      btnReadNowA.disabled = false;
+      btnReadNowB.disabled = false;
+
+      btnChangeLogin.style.display = "inline-block";
+      setStatus("Logged in. Tap “Refresh All” to update.");
+    }
+  }
+
+  function login() {
+    const user = prompt("DEV API username:");
+    if (user === null) return;
+    const pass = prompt("DEV API password:");
+    if (pass === null) return;
+
+    authHeader = "Basic " + btoa(user + ":" + pass);
+    updateLoginUI();
+    refreshAll(); // auto-load after login
   }
 
   function setTankUI(deviceId, latestObj) {
@@ -167,115 +252,76 @@
     }
   }
 
-  function localDateKey(ts) {
-  const d = new Date(ts);
-  // YYYY-MM-DD in local time
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
+  function setHistoryUI(deviceId, readings) {
+    const ul = document.getElementById(deviceId === "tankA" ? "histA" : "histB");
+    ul.innerHTML = "";
 
-function labelForDateKey(key) {
-  const today = localDateKey(new Date().toISOString());
-  const yesterdayDate = new Date();
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterday = localDateKey(yesterdayDate.toISOString());
+    if (!readings || readings.length === 0) {
+      const li = document.createElement("li");
+      li.className = "muted";
+      li.textContent = "No history yet.";
+      ul.appendChild(li);
+      return;
+    }
 
-  if (key === today) return "Today";
-  if (key === yesterday) return "Yesterday";
-  return key; // fallback: YYYY-MM-DD
-}
+    const sorted = readings.slice().sort((a, b) => new Date(b.ts) - new Date(a.ts));
 
+    const groups = new Map();
+    for (const r of sorted) {
+      const key = localDateKey(r.ts);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push(r);
+    }
 
-function setHistoryUI(deviceId, readings) {
-  const ul = document.getElementById(deviceId === "tankA" ? "histA" : "histB");
-  ul.innerHTML = "";
+    const keys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
 
-  if (!readings || readings.length === 0) {
-    const li = document.createElement("li");
-    li.className = "muted";
-    li.textContent = "No history yet.";
-    ul.appendChild(li);
-    return;
-  }
+    const MAX_ITEMS = 30;
+    let rendered = 0;
 
-  // Sort newest first (by timestamp)
-  const sorted = readings.slice().sort((a, b) => {
-    const ta = new Date(a.ts).getTime();
-    const tb = new Date(b.ts).getTime();
-    return tb - ta;
-  });
-
-  // Group by LOCAL day
-  const groups = new Map(); // dateKey -> array
-  for (const r of sorted) {
-    const key = localDateKey(r.ts);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(r);
-  }
-
-  // Render groups in newest day first
-  const keys = Array.from(groups.keys()).sort((a, b) => (a < b ? 1 : -1));
-
-  // Limit total rendered items for mobile (adjust if you want)
-  const MAX_ITEMS = 30;
-  let rendered = 0;
-
-  for (const key of keys) {
-    if (rendered >= MAX_ITEMS) break;
-
-    // Day header
-    const headerLi = document.createElement("li");
-    headerLi.style.marginTop = "10px";
-    headerLi.style.listStyle = "none";
-    headerLi.innerHTML = `<span class="muted" style="font-weight:800;">${labelForDateKey(key)}</span>`;
-    ul.appendChild(headerLi);
-
-    for (const r of groups.get(key)) {
+    for (const key of keys) {
       if (rendered >= MAX_ITEMS) break;
 
-      const li = document.createElement("li");
-      const lvl = Number(r.level_pct);
-      const lvlTxt = Number.isFinite(lvl) ? lvl.toFixed(1) + "%" : "?%";
-      li.innerHTML =
-        `<span class="mono">${formatTs(r.ts)}</span> — <b>${lvlTxt}</b> ` +
-        `<span class="muted">(${r.source || "?"})</span>`;
-      ul.appendChild(li);
-      rendered++;
+      const headerLi = document.createElement("li");
+      headerLi.style.marginTop = "10px";
+      headerLi.style.listStyle = "none";
+      headerLi.innerHTML = `<span class="muted" style="font-weight:800;">${labelForDateKey(key)}</span>`;
+      ul.appendChild(headerLi);
+
+      for (const r of groups.get(key)) {
+        if (rendered >= MAX_ITEMS) break;
+
+        const li = document.createElement("li");
+        const lvl = Number(r.level_pct);
+        const lvlTxt = Number.isFinite(lvl) ? lvl.toFixed(1) + "%" : "?%";
+        li.innerHTML =
+          `<span class="mono">${formatTs(r.ts)}</span> — <b>${lvlTxt}</b> ` +
+          `<span class="muted">(${r.source || "?"})</span>`;
+        ul.appendChild(li);
+        rendered++;
+      }
     }
   }
-}
-
 
   async function apiGet(path) {
-    if (!authHeader) throw new Error("No credentials set");
-    const res = await fetch(API_BASE + path, {
-      method: "GET",
-      headers: { "Authorization": authHeader }
-    });
+    if (!authHeader) throw new Error("Not logged in");
+    const res = await fetch(API_BASE + path, { method: "GET", headers: { "Authorization": authHeader } });
     const text = await res.text();
     return { status: res.status, text };
   }
 
   async function apiPost(path) {
-    if (!authHeader) throw new Error("No credentials set");
-    const res = await fetch(API_BASE + path, {
-      method: "POST",
-      headers: { "Authorization": authHeader }
-    });
+    if (!authHeader) throw new Error("Not logged in");
+    const res = await fetch(API_BASE + path, { method: "POST", headers: { "Authorization": authHeader } });
     const text = await res.text();
     return { status: res.status, text };
   }
 
   async function refreshOne(deviceId) {
-    // latest
     const latestResp = await apiGet(`/latest?device_id=${encodeURIComponent(deviceId)}`);
     let latestObj = null;
     try { latestObj = JSON.parse(latestResp.text); } catch {}
     setTankUI(deviceId, latestObj);
 
-    // history
     const histResp = await apiGet(`/history?device_id=${encodeURIComponent(deviceId)}&days=5`);
     let histObj = null;
     try { histObj = JSON.parse(histResp.text); } catch {}
@@ -283,12 +329,8 @@ function setHistoryUI(deviceId, readings) {
   }
 
   async function refreshAll() {
-    if (!authHeader) {
-      setStatus("No credentials set. Click “Set Credentials” first.");
-      return;
-    }
-
-    setStatus("Loading...");
+    if (!authHeader) { updateLoginUI(); return; }
+    setStatus("Loading…");
     try {
       await Promise.all([refreshOne("tankA"), refreshOne("tankB")]);
       setStatus("Updated.");
@@ -298,18 +340,14 @@ function setHistoryUI(deviceId, readings) {
   }
 
   async function readNow(deviceId) {
-    if (!authHeader) {
-      setStatus("No credentials set. Click “Set Credentials” first.");
-      return;
-    }
+    if (!authHeader) { updateLoginUI(); return; }
 
     const btn = document.getElementById(deviceId === "tankA" ? "btnReadNowA" : "btnReadNowB");
     btn.disabled = true;
     const oldTxt = btn.textContent;
-    btn.textContent = "Working...";
+    btn.textContent = "Working…";
 
     try {
-      // capture old ts
       let oldTs = null;
       try {
         const latest = await apiGet(`/latest?device_id=${encodeURIComponent(deviceId)}`);
@@ -317,9 +355,9 @@ function setHistoryUI(deviceId, readings) {
         oldTs = obj?.data?.ts || null;
       } catch {}
 
-      setStatus(`Sending Read Now for ${deviceId}...`);
+      setStatus(`Sending Read Now for ${deviceId}…`);
       const r = await apiPost(`/command/read_now?device_id=${encodeURIComponent(deviceId)}`);
-      setStatus(`Read Now sent (HTTP ${r.status}). Waiting for device update...`);
+      setStatus(`Read Now sent (HTTP ${r.status}). Waiting for device…`);
 
       const start = Date.now();
       while (Date.now() - start < 70000) {
@@ -344,10 +382,14 @@ function setHistoryUI(deviceId, readings) {
     }
   }
 
-  document.getElementById("btnLogin").addEventListener("click", setCredentials);
+  // Wiring
+  document.getElementById("btnLoginBig").addEventListener("click", login);
+  document.getElementById("btnChangeLogin").addEventListener("click", () => { authHeader = null; updateLoginUI(); login(); });
   document.getElementById("btnRefresh").addEventListener("click", refreshAll);
   document.getElementById("btnReadNowA").addEventListener("click", () => readNow("tankA"));
   document.getElementById("btnReadNowB").addEventListener("click", () => readNow("tankB"));
+
+  updateLoginUI();
 </script>
 </body>
 </html>
