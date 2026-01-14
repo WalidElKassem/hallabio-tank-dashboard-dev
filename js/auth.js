@@ -2,6 +2,7 @@
 window.authHeader = null;
 
 window.updateLoginUI = function(){
+  const authEnabled = window.AUTH_ENABLED !== false;
   const gate = document.getElementById("loginGate");
   const grid = document.querySelector(".grid");
   const btnRefresh = document.getElementById("btnRefresh");
@@ -9,6 +10,20 @@ window.updateLoginUI = function(){
   const btnLoginTop = document.getElementById("btnLoginTop");
   const btnReadNowA = document.getElementById("btnReadNowA");
   const btnReadNowB = document.getElementById("btnReadNowB");
+
+  if (!authEnabled) {
+    gate.style.display = "none";
+    grid.classList.remove("dimmed");
+
+    if(btnRefresh) btnRefresh.disabled = false;
+    if(btnReadNowA) btnReadNowA.disabled = false;
+    if(btnReadNowB) btnReadNowB.disabled = false;
+
+    if(btnChangeLogin) btnChangeLogin.style.display = "none";
+    if(btnLoginTop) btnLoginTop.style.display = "none";
+    if(window.setStatus) window.setStatus("Authentication disabled for testing.");
+    return;
+  }
 
   if (!window.authHeader) {
     gate.style.display = "flex";
@@ -36,6 +51,11 @@ window.updateLoginUI = function(){
 }
 
 window.login = function(){
+  if (window.AUTH_ENABLED === false) {
+    window.authHeader = null;
+    window.updateLoginUI();
+    return;
+  }
   const user = prompt("DEV API username:");
   if (user === null) return;
   const pass = prompt("DEV API password:");
