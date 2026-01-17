@@ -10,7 +10,7 @@ window.refreshOne = async function(deviceId){
 }
 
 window.refreshAll = async function(){
-  if (!window.authHeader) { window.updateLoginUI(); return; }
+  if (window.AUTH_ENABLED && !window.authHeader) { window.updateLoginUI(); return; }
   window.setStatus("Loading…");
   try {
     await Promise.all([window.refreshOne("tankA"), window.refreshOne("tankB")]);
@@ -21,7 +21,7 @@ window.refreshAll = async function(){
 }
 
 window.readNow = async function(deviceId){
-  if (!window.authHeader) { window.updateLoginUI(); return; }
+  if (window.AUTH_ENABLED && !window.authHeader) { window.updateLoginUI(); return; }
   const btn = document.getElementById(deviceId === "tankA" ? "btnReadNowA" : "btnReadNowB");
   if(!btn) return;
   btn.disabled = true; const oldTxt = btn.textContent; btn.textContent = "Working…";
