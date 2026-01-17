@@ -65,4 +65,11 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // initial UI state
   window.updateLoginUI();
+
+  // initial data load on page open
+  if (btnRefresh) btnRefresh.disabled = true;
+  const initialLoad = window.refreshAll();
+  if (initialLoad && typeof initialLoad.finally === "function") {
+    initialLoad.finally(() => window.updateLoginUI());
+  }
 });
