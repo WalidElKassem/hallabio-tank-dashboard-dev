@@ -10,6 +10,20 @@ window.updateLoginUI = function(){
   const btnReadNowA = document.getElementById("btnReadNowA");
   const btnReadNowB = document.getElementById("btnReadNowB");
 
+  if (!window.AUTH_ENABLED) {
+    if (gate) gate.style.display = "none";
+    if (grid) grid.classList.remove("dimmed");
+
+    if(btnRefresh) btnRefresh.disabled = false;
+    if(btnReadNowA) btnReadNowA.disabled = false;
+    if(btnReadNowB) btnReadNowB.disabled = false;
+
+    if(btnChangeLogin) btnChangeLogin.style.display = "none";
+    if(btnLoginTop) btnLoginTop.style.display = "none";
+    if(window.setStatus) window.setStatus("Authentication disabled.");
+    return;
+  }
+
   if (!window.authHeader) {
     gate.style.display = "flex";
     grid.classList.add("dimmed");
@@ -36,6 +50,7 @@ window.updateLoginUI = function(){
 }
 
 window.login = function(){
+  if (!window.AUTH_ENABLED) return;
   const user = prompt("DEV API username:");
   if (user === null) return;
   const pass = prompt("DEV API password:");

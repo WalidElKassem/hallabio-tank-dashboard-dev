@@ -31,9 +31,17 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .kv { display:grid; grid-template-columns: 120px 1fr; gap: 6px 10px; margin-top: 18px; }
 .k { color:#6b7280; }
-.history { margin-top: 12px; }
-.history ul { padding-left: 18px; margin: 8px 0 0; }
-.history li { margin: 6px 0; }
+.history-accordion { margin-top: 14px; border-radius: 12px; border: 1px solid rgba(12,18,32,0.06); background: #fff; box-shadow: 0 1px 2px rgba(12,18,32,0.03); }
+.history-accordion summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 12px; font-weight: 700; }
+.history-accordion summary::-webkit-details-marker { display: none; }
+.history-accordion summary::after { content: ""; width: 10px; height: 10px; border-right: 2px solid #64748b; border-bottom: 2px solid #64748b; transform: rotate(45deg); transition: transform 180ms ease; }
+.history-accordion[open] summary::after { transform: rotate(225deg); }
+.history-accordion summary:focus-visible { outline: 2px solid rgba(14,88,255,0.5); outline-offset: 2px; border-radius: 10px; }
+.history-title { font-size: 0.95rem; }
+.history-meta { font-weight: 500; font-size: 0.85rem; }
+.history-content { padding: 0 12px 12px; }
+.history-content ul { padding-left: 18px; margin: 6px 0 0; }
+.history-content li { margin: 6px 0; }
 .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 0.9rem; }
 
 /* Gauge styles */
