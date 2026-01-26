@@ -41,6 +41,7 @@ window.setTankUI = function(deviceId, latestObj){
   const sourceEl = document.getElementById("source" + suf);
   const tsEl = document.getElementById("ts" + suf);
   const badgeEl = document.getElementById("badge" + suf);
+  const statusEl = document.getElementById("status" + suf);
 
   if (!latestObj || !latestObj.data) {
     if(levelEl) levelEl.textContent = "--%";
@@ -48,6 +49,7 @@ window.setTankUI = function(deviceId, latestObj){
     if(sourceEl) sourceEl.textContent = "—";
     if(tsEl) tsEl.textContent = "—";
     if(badgeEl) { badgeEl.className = "badge unknown"; badgeEl.textContent = "NO DATA"; }
+    if(statusEl) { statusEl.className = "device-status offline"; statusEl.textContent = "OFFLINE"; }
     return;
   }
 
@@ -58,6 +60,13 @@ window.setTankUI = function(deviceId, latestObj){
   if(updatedEl) updatedEl.textContent = "Last updated: " + window.formatTs(d.ts);
   if(sourceEl) sourceEl.textContent = d.source || "—";
   if(tsEl) tsEl.textContent = d.ts || "—";
+
+  const tsMs = Date.parse(d.ts || "");
+  const isOnline = Number.isFinite(tsMs) && (Date.now() - tsMs) <= (2 * 60 * 1000);
+  if (statusEl) {
+    statusEl.className = "device-status " + (isOnline ? "online" : "offline");
+    statusEl.textContent = isOnline ? "ONLINE" : "OFFLINE";
+  }
 
   // update badge
   if (Number.isFinite(lvl) && lvl < window.LOW_THRESHOLD) {

@@ -21,10 +21,14 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .card { background: linear-gradient(180deg,#ffffff,#fbfdff); border-radius: 12px; padding: 16px; box-shadow: 0 6px 18px rgba(12,18,32,0.04); border: 1px solid rgba(12,18,32,0.03); }
 .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between; }
+.title-wrap { display: flex; align-items: center; gap: 8px; }
 .card h2 { margin: 0 0 8px 0; font-size: 1.05rem; }
 .big { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.02em; color:#0f1724 }
 
 .badge { padding: 6px 12px; border-radius: 999px; font-size: 0.82rem; font-weight: 800; border: 1px solid #e6eefc; }
+.device-status { padding: 4px 8px; border-radius: 999px; font-size: 0.72rem; font-weight: 800; border: 1px solid #e6eefc; }
+.device-status.online { background: #e9f7ee; border-color: #cfe9d1; color:#14532d }
+.device-status.offline { background: #fff1f2; border-color: #ffd6d9; color:#981b1b }
 .ok { background: #e9f7ee; border-color: #cfe9d1; color:#14532d }
 .low { background: #fff1f2; border-color: #ffd6d9; color:#981b1b }
 .unknown { background: #f3f4f6; border-color:#e5e7eb; color:#374151 }
