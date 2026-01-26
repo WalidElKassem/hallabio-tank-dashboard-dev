@@ -49,6 +49,23 @@ window.readNow = async function(deviceId){
   finally { btn.disabled = false; btn.textContent = oldTxt; }
 }
 
+// Override refreshAll with guard to avoid overlapping refreshes.
+window.refreshInFlight = false;
+window.refreshAll = async function(){
+  if (window.refreshInFlight) { return; }
+  window.refreshInFlight = true;
+  if (window.AUTH_ENABLED && !window.authHeader) { window.updateLoginUI(); window.refreshInFlight = false; return; }
+  window.setStatus("Loading...");
+  try {
+    await Promise.all([window.refreshOne("tankA"), window.refreshOne("tankB")]);
+    window.setStatus("Updated.");
+  } catch (e) {
+    window.setStatus("Error: " + (e?.message || e));
+  } finally {
+    window.refreshInFlight = false;
+  }
+}
+
 // Wiring event handlers
 document.addEventListener('DOMContentLoaded', function(){
   const btnLogin = document.getElementById("btnLoginTop");
@@ -72,4 +89,17 @@ document.addEventListener('DOMContentLoaded', function(){
   if (initialLoad && typeof initialLoad.finally === "function") {
     initialLoad.finally(() => window.updateLoginUI());
   }
+
+  const autoRefreshMs = 60 * 1000;
+  const scheduleAutoRefresh = () => {
+    window.clearTimeout(window.autoRefreshTimer);
+    window.autoRefreshTimer = window.setTimeout(async () => {
+      if (!document.hidden) {
+        await window.refreshAll();
+      }
+      scheduleAutoRefresh();
+    }, autoRefreshMs);
+  };
+  scheduleAutoRefresh();
+  document.addEventListener('visibilitychange', scheduleAutoRefresh);
 });
