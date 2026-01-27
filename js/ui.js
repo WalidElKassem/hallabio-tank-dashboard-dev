@@ -62,7 +62,7 @@ window.setTankUI = function(deviceId, latestObj){
   if(tsEl) tsEl.textContent = d.ts || "—";
 
   const tsMs = Date.parse(d.ts || "");
-  const isOnline = Number.isFinite(tsMs) && (Date.now() - tsMs) <= (2 * 60 * 1000);
+  const isOnline = Number.isFinite(tsMs) && (Date.now() - tsMs) <= (6 * 60 * 1000);
   if (statusEl) {
     statusEl.className = "device-status " + (isOnline ? "online" : "offline");
     statusEl.textContent = isOnline ? "ONLINE" : "OFFLINE";
