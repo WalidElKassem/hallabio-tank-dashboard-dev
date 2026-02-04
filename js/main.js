@@ -73,9 +73,18 @@ window.loadConfigModes = async function(){
 window.setSensorMode = async function(deviceId, mode){
   const normalized = window.normalizeSensorMode(mode);
   if (!normalized) throw new Error("Invalid sensor mode");
-  const r = await window.apiPost("/command/set_sensor_mode", { device_id: deviceId, mode: normalized });
-  if (r.status < 200 || r.status >= 300) throw new Error("Set mode failed (HTTP " + r.status + ")");
-  return r;
+  try {
+    const r = await window.apiPost("/command/set_sensor_mode", { device_id: deviceId, mode: normalized });
+    if (r.status >= 200 && r.status < 300) return r;
+    const fallback = await window.apiPost(`/command/set_sensor_mode?device_id=${encodeURIComponent(deviceId)}&mode=${encodeURIComponent(normalized)}`);
+    if (fallback.status < 200 || fallback.status >= 300) throw new Error("Set mode failed (HTTP " + fallback.status + ")");
+    return fallback;
+  } catch (_) {
+    // Keep command shape compatible with endpoints that only accept query params.
+    const fallback = await window.apiPost(`/command/set_sensor_mode?device_id=${encodeURIComponent(deviceId)}&mode=${encodeURIComponent(normalized)}`);
+    if (fallback.status < 200 || fallback.status >= 300) throw new Error("Set mode failed (HTTP " + fallback.status + ")");
+    return fallback;
+  }
 }
 
 window.onSensorModeToggle = async function(deviceId){
