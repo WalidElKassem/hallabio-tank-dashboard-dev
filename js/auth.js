@@ -9,6 +9,8 @@ window.updateLoginUI = function(){
   const btnLoginTop = document.getElementById("btnLoginTop");
   const btnReadNowA = document.getElementById("btnReadNowA");
   const btnReadNowB = document.getElementById("btnReadNowB");
+  const modeA = document.getElementById("modeA");
+  const modeB = document.getElementById("modeB");
 
   if (!window.AUTH_ENABLED) {
     if (gate) gate.style.display = "none";
@@ -17,6 +19,8 @@ window.updateLoginUI = function(){
     if(btnRefresh) btnRefresh.disabled = false;
     if(btnReadNowA) btnReadNowA.disabled = false;
     if(btnReadNowB) btnReadNowB.disabled = false;
+    if(modeA) modeA.disabled = false;
+    if(modeB) modeB.disabled = false;
 
     if(btnChangeLogin) btnChangeLogin.style.display = "none";
     if(btnLoginTop) btnLoginTop.style.display = "none";
@@ -31,6 +35,8 @@ window.updateLoginUI = function(){
     if(btnRefresh) btnRefresh.disabled = true;
     if(btnReadNowA) btnReadNowA.disabled = true;
     if(btnReadNowB) btnReadNowB.disabled = true;
+    if(modeA) modeA.disabled = true;
+    if(modeB) modeB.disabled = true;
 
     if(btnChangeLogin) btnChangeLogin.style.display = "none";
     if(btnLoginTop) btnLoginTop.style.display = "inline-block";
@@ -42,6 +48,8 @@ window.updateLoginUI = function(){
     if(btnRefresh) btnRefresh.disabled = false;
     if(btnReadNowA) btnReadNowA.disabled = false;
     if(btnReadNowB) btnReadNowB.disabled = false;
+    if(modeA) modeA.disabled = false;
+    if(modeB) modeB.disabled = false;
 
     if(btnChangeLogin) btnChangeLogin.style.display = "inline-block";
     if(btnLoginTop) btnLoginTop.style.display = "none";
@@ -59,4 +67,5 @@ window.login = function(){
   window.authHeader = "Basic " + btoa(user + ":" + pass);
   window.updateLoginUI();
   if(window.refreshAll) window.refreshAll();
+  if(window.loadConfigModes) window.loadConfigModes();
 }

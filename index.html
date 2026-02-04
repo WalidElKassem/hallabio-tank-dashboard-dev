@@ -54,7 +54,17 @@
             <div id="updatedA" class="muted">Last updated: —</div>
           </div>
         </div>
-        <div class="card-actions"><button id="btnReadNowA" disabled>Read now</button></div>
+        <div class="card-actions">
+          <label class="mode-wrap" for="modeA">
+            <span class="mode-text">Sensor Mode: Simulated / Real</span>
+            <span class="switch">
+              <input type="checkbox" id="modeA" aria-label="Sensor mode for tankA">
+              <span class="slider"></span>
+            </span>
+          </label>
+          <div id="modeMsgA" class="muted mode-msg">Mode: Simulated</div>
+          <button id="btnReadNowA" disabled>Read now</button>
+        </div>
       </div>
 
       <div class="kv">
@@ -95,7 +105,17 @@
             <div id="updatedB" class="muted">Last updated: —</div>
           </div>
         </div>
-        <div class="card-actions"><button id="btnReadNowB" disabled>Read now</button></div>
+        <div class="card-actions">
+          <label class="mode-wrap" for="modeB">
+            <span class="mode-text">Sensor Mode: Simulated / Real</span>
+            <span class="switch">
+              <input type="checkbox" id="modeB" aria-label="Sensor mode for tankB">
+              <span class="slider"></span>
+            </span>
+          </label>
+          <div id="modeMsgB" class="muted mode-msg">Mode: Simulated</div>
+          <button id="btnReadNowB" disabled>Read now</button>
+        </div>
       </div>
 
       <div class="kv">
