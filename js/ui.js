@@ -34,6 +34,21 @@ window.labelForDateKey = function(key){
   return key;
 }
 
+window.formatDeviceTitle = function(name, fwVersion){
+  const raw = (fwVersion === undefined || fwVersion === null) ? "" : String(fwVersion);
+  const fw = raw.trim().length === 0 ? "unknown" : raw;
+  return name + " (fw ver: " + fw + ")";
+}
+
+window.updateDeviceTitle = function(deviceId, fwVersion){
+  const suf = deviceId === "tankA" ? "A" : "B";
+  const titleEl = document.getElementById("title" + suf);
+  if (!titleEl) return;
+  const base = titleEl.getAttribute("data-base") || titleEl.textContent || "";
+  const next = window.formatDeviceTitle(base, fwVersion);
+  if (titleEl.textContent !== next) titleEl.textContent = next;
+}
+
 window.setTankUI = function(deviceId, latestObj){
   const suf = deviceId === "tankA" ? "A" : "B";
   const levelEl = document.getElementById("level" + suf);
@@ -44,6 +59,7 @@ window.setTankUI = function(deviceId, latestObj){
   const statusEl = document.getElementById("status" + suf);
 
   if (!latestObj || !latestObj.data) {
+    window.updateDeviceTitle(deviceId, null);
     if(levelEl) levelEl.textContent = "--%";
     if(updatedEl) updatedEl.textContent = "Last updated: —";
     if(sourceEl) sourceEl.textContent = "—";
@@ -54,6 +70,7 @@ window.setTankUI = function(deviceId, latestObj){
   }
 
   const d = latestObj.data;
+  window.updateDeviceTitle(deviceId, d.firmware_version);
   const lvl = Number(d.level_pct);
 
   if(levelEl) levelEl.textContent = (Number.isFinite(lvl) ? lvl.toFixed(1) : "--") + "%";
