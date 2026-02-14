@@ -71,3 +71,23 @@ hallabio-tank-dashboard-dev/
 
 ## 🏷 License
 TBD
+
+## React Dashboard (new UI)
+
+A modern React + Tailwind frontend is available in `dashboard-react/`.
+
+Run locally:
+```bash
+cd dashboard-react
+npm install
+npm run dev
+```
+
+Build static assets for GitHub Pages:
+```bash
+cd dashboard-react
+npm run build
+```
+
+Build output: `dashboard-react/dist/`.
+
